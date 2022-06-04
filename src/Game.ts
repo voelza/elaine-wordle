@@ -2,6 +2,7 @@ import { component, state } from "elaine";
 import State from "elaine/dist/states/State";
 import Keyboard from "./Keyboard";
 import Word from "./Word";
+import wordsIKnow from "./words.json";
 
 export default component({
     name: "game",
@@ -40,18 +41,6 @@ export default component({
     `,
     setup: (instance) => {
         const totalGuesses = 6;
-        const wordsIKnow = [
-            "which",
-            "there",
-            "their",
-            "about",
-            "would",
-            "these",
-            "other",
-            "words",
-            "could",
-            "horse"
-        ]
         let theWord: string = "horse";
         const words: State<string[]> = state([]);
         const usedGuesses = state(0);
