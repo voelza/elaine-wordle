@@ -53,8 +53,9 @@ export default component({
             }
             return "";
         }
-        const getStatus = (isRevealed: boolean, index: number) => {
-            const i = input.value;
+
+
+        const getStatusWithInput = (isRevealed: boolean, index: number, i: string) => {
             if (!isRevealed) {
                 return 2;
             }
@@ -76,6 +77,29 @@ export default component({
 
             return 2;
         }
+
+        const getStatus = (isRevealed: boolean, index: number) => {
+            return getStatusWithInput(isRevealed, index, input.value);
+        }
+
+        setupSate.addGlobalEventListener("enter", (input: string) => {
+            if (!setupSate.data.isActive.value) {
+                return;
+            }
+            let entry = "";
+            wordArray.value.forEach((_, i) => {
+                const status = getStatusWithInput(true, i, input);
+                console.log(status);
+                if (status === 2) {
+                    entry += "⬛";
+                } else if (status === 1) {
+                    entry += "🟨";
+                } else if (status === 0) {
+                    entry += "🟩";
+                }
+            });
+            setupSate.dispatchGlobalEvent("historyAdd", entry);
+        });
 
         return {
             state: {

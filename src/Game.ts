@@ -10,7 +10,10 @@ export default component({
     <div class="game">
         <div @@if="@@result" class="result">
             <div class="result-text">@@{result}</div>
-            <button ++click="setWord">Play Again</button>
+            <div class="result-btns">
+                <button ++click="resultToClipboard">Save to Clipboard</button>
+                <button ++click="setWord">Play Again</button>
+            </div>
         </div>
         <word @@for="word in @@words" word="@@word" isActive="@@isActive(@@usedGuesses, @@_index)" isRevealed="@@isRevealed(@@usedGuesses, @@_index)"></word>
         <keyboard>/keyboard>
@@ -38,6 +41,13 @@ export default component({
     .result-text {
         font-size: 1.25rem;
     }
+
+    .result-btns {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+    }
     `,
     setup: (instance) => {
         const totalGuesses = 6;
@@ -47,6 +57,15 @@ export default component({
         const result: State<string | null> = state(null);
         const input: State<string> = state("");
         instance.$store.add({ input });
+
+        let history: string[] = [];
+        instance.addGlobalEventListener("historyAdd", (entry: string) => {
+            history.push(entry);
+        });
+
+        function resultToClipboard() {
+            navigator.clipboard.writeText("Elaine Wordle\n" + history.join("\n"))
+        }
 
         let gameOver = false;
         const setWord = () => {
@@ -60,6 +79,7 @@ export default component({
             input.value = "";
             result.value = null;
             gameOver = false;
+            history = [];
             instance.dispatchGlobalEvent("reset");
         };
         setWord();
@@ -107,7 +127,6 @@ export default component({
         instance.addGlobalEventListener("handleKeyInput", handleKeyInput);
         instance.addGlobalEventListener("handleBackspace", handleBackspace);
         instance.addGlobalEventListener("handleEnter", handleEnter);
-
         return {
             state: {
                 theWord,
@@ -116,7 +135,8 @@ export default component({
                 result,
                 setWord,
                 isActive: (guess: number, index: number) => guess === index,
-                isRevealed: (guess: number, index: number) => guess > index
+                isRevealed: (guess: number, index: number) => guess > index,
+                resultToClipboard
             },
             onDestroyed: () => {
                 window.removeEventListener("keydown", handleInput);
