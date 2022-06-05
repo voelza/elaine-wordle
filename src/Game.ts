@@ -11,7 +11,7 @@ export default component({
         <div @@if="@@result" class="result">
             <div class="result-text">@@{result}</div>
             <div class="result-btns">
-                <button ++click="resultToClipboard">Save to Clipboard</button>
+                <button ++click="resultToClipboard">Share</button>
                 <button ++click="setWord">Play Again</button>
             </div>
         </div>
@@ -49,6 +49,10 @@ export default component({
         flex-direction: row;
         align-items: center;
         gap: 10px;
+    }
+
+    button {
+        width: 100px;
     }
     `,
     setup: (instance) => {

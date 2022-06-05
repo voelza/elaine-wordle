@@ -11,6 +11,13 @@ body {
   color: #2c3e50;
 }
 
+button {
+  border: 1px solid lightgray;
+  background-color: transparent;
+  padding: 5px;
+  border-radius: 5px;
+}
+
 @keyframes flip {
   0% {
     transform: scaleY(1);

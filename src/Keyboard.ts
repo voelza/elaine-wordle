@@ -10,10 +10,11 @@ export default component({
         </div>
         <div class="keyboard-row">
             <div @@for="key in @@secondRow" class="key" @@class="{@@alreadyUsed(@@usedKeys,@@key) : used}" ++click="addInput(@@key)">@@{key}</div>
-            <div class="key" ++click="enter">Enter</div>
         </div>
         <div class="keyboard-row">
+            <div class="key" ++click="enter">Enter</div>
             <div @@for="key in @@thirdRow" class="key" @@class="{@@alreadyUsed(@@usedKeys,@@key) : used}" ++click="addInput(@@key)">@@{key}</div>
+            <div class="key" ++click="backspace">⌫</div>
         </div>
     </div>
     `,
@@ -36,7 +37,7 @@ export default component({
     }
 
     .key {
-        min-width: 20px;
+        min-width: 17px;
         height: 20px;
         padding: 5px;
         border: 1px solid gray;
@@ -44,6 +45,9 @@ export default component({
         background-color: white;
         cursor: pointer;
         text-transform: capitalize;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 
     .key:hover {
@@ -78,6 +82,9 @@ export default component({
                 },
                 enter: () => {
                     instance.dispatchGlobalEvent("handleEnter");
+                },
+                backspace: () => {
+                    instance.dispatchGlobalEvent("handleBackspace");
                 }
             }
         }
