@@ -16,6 +16,7 @@ button {
   background-color: transparent;
   padding: 5px;
   border-radius: 5px;
+  cursor: pointer;
 }
 
 @keyframes flip {
