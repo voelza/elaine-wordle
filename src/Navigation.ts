@@ -4,7 +4,7 @@ export default component({
     name: "navigation",
     template: `
     <nav>
-        <div>Elaine Wordle</div>
+        <div>Worsle 💀</div>
     </nav>
     `,
     css: `
