@@ -17,8 +17,8 @@ export default component({
         <div @@if="@@result" class="result">
             <div class="result-text">@@{result}</div>
             <div class="result-btns">
-                <button ++click="resultToClipboard">Share</button>
-                <button ++click="setWord">Play Again</button>
+                Come back tomorrow!
+                <button ++click="resultToClipboard">Share ☍</button>
             </div>
         </div>
         <word @@for="word in @@words" 
@@ -73,14 +73,16 @@ export default component({
             return date.getTime();
         }
         const today = new Date();
+        const lastSeen = new Date(JSON.parse(localStorage.getItem("wordle-last-seen") ?? JSON.stringify(today)));
+        localStorage.setItem("wordle-last-seen", JSON.stringify(today));
         const WORD_INDEX = Math.round((dayAtMidnightTime(today) - dayAtMidnightTime(new Date("2022-06-04T00:00:00"))) / ONE_DAY_IN_MS);
 
         function saveHistory(h: HistoryEntry[]) {
-            localStorage.setItem("history", JSON.stringify(h));
+            localStorage.setItem("wordle-history", JSON.stringify(h));
         }
 
         function loadHistory(): HistoryEntry[] {
-            const history = localStorage.getItem("history");
+            const history = localStorage.getItem("wordle-history");
             return history ? JSON.parse(history) : [];
         }
 
@@ -107,24 +109,23 @@ export default component({
         }
 
         let gameOver = false;
-        const setWord = (init: boolean | undefined = false) => {
-            theWord = wordsIKnow[WORD_INDEX].toLowerCase();
-            const nextWords = [];
-            for (let i = 0; i < totalGuesses; i++) {
-                nextWords.push(theWord);
-            }
-            words.value = nextWords;
+        theWord = wordsIKnow[WORD_INDEX].toLowerCase();
+        const nextWords = [];
+        for (let i = 0; i < totalGuesses; i++) {
+            nextWords.push(theWord);
+        }
+        words.value = nextWords;
+        const reset = () => {
+            history = [];
+            saveHistory(history);
             input.value = "";
             result.value = null;
-            gameOver = false;
-            if (init !== true) {
-                usedGuesses.value = 0;
-                history = [];
-                saveHistory(history);
-            }
+            usedGuesses.value = 0;
             instance.dispatchGlobalEvent("reset");
         };
-        setWord(true);
+        if (dayAtMidnightTime(lastSeen) - dayAtMidnightTime(today) !== 0) {
+            reset();
+        }
 
         function won() {
             result.value = `You Won! 😎 The word was "${theWord.toUpperCase()}".`;
@@ -204,7 +205,6 @@ export default component({
                 words,
                 usedGuesses,
                 result,
-                setWord,
                 isActive: (guess: number, index: number) => guess === index,
                 isRevealed: (guess: number, index: number) => guess > index,
                 resultToClipboard,
