@@ -77,7 +77,7 @@ export default component({
 
         let gameOver = false;
         const setWord = () => {
-            theWord = wordsIKnow[Math.floor(Math.random() * wordsIKnow.length)];
+            theWord = wordsIKnow[Math.floor(Math.random() * wordsIKnow.length)].toLowerCase();
             usedGuesses.value = 0;
             const nextWords = [];
             for (let i = 0; i < totalGuesses; i++) {
@@ -94,7 +94,7 @@ export default component({
 
         function handleKeyInput(key: string) {
             if (input.value.length < theWord.length) {
-                input.value += key;
+                input.value += key.toLowerCase();
             }
         }
 
@@ -108,6 +108,12 @@ export default component({
             if (input.value.length !== theWord.length || gameOver) {
                 return;
             }
+
+            if (!wordsIKnow.some(i => i.toLowerCase() === input.value.toLowerCase())) {
+                toast("Word not in list!", { messageStyle: "text-align: center;", backgroundColor: "#e7f385b8" });
+                return;
+            }
+
             instance.dispatchGlobalEvent("enter", input.value);
             usedGuesses.value++;
             if (input.value === theWord) {
