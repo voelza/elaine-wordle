@@ -1,6 +1,7 @@
 import { component, state } from "elaine";
 import State from "elaine/dist/states/State";
 import Keyboard from "./Keyboard";
+import toast from "./Toaster";
 import Word from "./Word";
 import wordsIKnow from "./words.json";
 
@@ -70,7 +71,8 @@ export default component({
         });
 
         function resultToClipboard() {
-            navigator.clipboard.writeText("Elaine Wordle\n" + history.join("\n"))
+            navigator.clipboard.writeText("Elaine Wordle\n" + history.join("\n"));
+            toast("Result was saved to clipboard!", { messageStyle: "text-align: center;", backgroundColor: "#aae1b3d9" });
         }
 
         let gameOver = false;

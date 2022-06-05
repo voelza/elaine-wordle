@@ -89,7 +89,6 @@ export default component({
             let entry = "";
             wordArray.value.forEach((_, i) => {
                 const status = getStatusWithInput(true, i, input);
-                console.log(status);
                 if (status === 2) {
                     entry += "⬛";
                 } else if (status === 1) {
