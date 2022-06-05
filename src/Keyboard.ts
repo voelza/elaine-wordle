@@ -19,13 +19,12 @@ export default component({
     `,
     css: `
     .keyboard {
-        position: absolute;
-        bottom: 15px;
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 5px;
         flex-wrap: wrap;
+        margin-top: auto;
     }
 
     .keyboard-row {

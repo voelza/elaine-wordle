@@ -26,6 +26,8 @@ export default component({
         align-items: center;
         justify-content: center;
         gap: 5px;
+        height: 100%;
+        margin-top: 75px;
     }
 
     .result {
