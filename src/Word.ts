@@ -1,5 +1,6 @@
 import { component, computed, state } from "elaine";
 import State from "elaine/dist/states/State";
+import { HistoryEntry } from "./Game";
 import Letter from "./Letter";
 
 export default component({
@@ -16,6 +17,10 @@ export default component({
         {
             name: "isRevealed",
             type: Boolean
+        },
+        {
+            name: "input",
+            type: String
         }
     ],
     template: `
@@ -40,7 +45,7 @@ export default component({
     setup: (setupSate) => {
         const theWord = setupSate.data.word;
         const wordArray = computed(() => [...theWord.value], theWord);
-        const input: State<string> = state("");
+        const input: State<string> = state(setupSate.data.input.value ?? "");
         setupSate.$store.watch("input", (i) => {
             if (setupSate.data.isActive.value) {
                 input.value = i;
@@ -86,18 +91,26 @@ export default component({
             if (!setupSate.data.isActive.value) {
                 return;
             }
-            let entry = "";
+            let guesses = "";
             wordArray.value.forEach((_, i) => {
                 const status = getStatusWithInput(true, i, input);
                 if (status === 2) {
-                    entry += "⬛";
+                    guesses += "⬛";
                 } else if (status === 1) {
-                    entry += "🟨";
+                    guesses += "🟨";
                 } else if (status === 0) {
-                    entry += "🟩";
+                    guesses += "🟩";
                 }
             });
-            setupSate.dispatchGlobalEvent("historyAdd", entry);
+            const historyEntry: HistoryEntry = {
+                word: input,
+                guesses
+            }
+            setupSate.dispatchGlobalEvent("historyAdd", historyEntry);
+        });
+
+        setupSate.addGlobalEventListener("reset", () => {
+            input.value = "";
         });
 
         return {

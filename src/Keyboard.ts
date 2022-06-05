@@ -58,8 +58,14 @@ export default component({
         background-color: lightgray;
     }
     `,
+    props: [
+        {
+            name: "usedKeys",
+            type: Array
+        }
+    ],
     setup: (instance) => {
-        const usedKeys: State<string[]> = state([]);
+        const usedKeys: State<string[]> = state(instance.data.usedKeys.value ?? []);
         instance.addGlobalEventListener("enter", (input: string) => {
             usedKeys.value = [...usedKeys.value, ...input];
         });
