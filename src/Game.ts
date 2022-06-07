@@ -106,7 +106,8 @@ export default component({
         instance.$store.add({ input });
         function resultToClipboard() {
             const header = horseMode ? "Horsle 🐴\n" : "Worsle 💀\n";
-            navigator.clipboard.writeText(header + history.map(h => h.guesses).join("\n") + "\n" + window.location.href);
+            const squares = horseMode ? history.map(h => [...h.guesses].map(_ => "🟩").join("")).join("\n") : history.map(h => h.guesses).join("\n");
+            navigator.clipboard.writeText(header + squares + "\n" + window.location.href);
             toast("Result was saved to clipboard!", { messageStyle: "text-align: center;", backgroundColor: "#aae1b3d9" });
         }
 
