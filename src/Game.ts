@@ -96,6 +96,7 @@ export default component({
             saveHistory(history);
         });
 
+        let horseMode = false;
         const totalGuesses = 6;
         let theWord: string = "horse";
         const words: State<string[]> = state([]);
@@ -104,7 +105,8 @@ export default component({
         const input: State<string> = state("");
         instance.$store.add({ input });
         function resultToClipboard() {
-            navigator.clipboard.writeText("Worsle 💀\n" + history.map(h => h.guesses).join("\n") + "\n" + window.location.href);
+            const header = horseMode ? "Horsle 🐴\n" : "Worsle 💀\n";
+            navigator.clipboard.writeText(header + history.map(h => h.guesses).join("\n") + "\n" + window.location.href);
             toast("Result was saved to clipboard!", { messageStyle: "text-align: center;", backgroundColor: "#aae1b3d9" });
         }
 
@@ -132,6 +134,12 @@ export default component({
             gameOver = true;
         }
 
+        function cheater() {
+            result.value = `That's right! 🐴 is always right, but the word was "${theWord.toUpperCase()}".`;
+            gameOver = true;
+            horseMode = true;
+        }
+
         function lost() {
             result.value = `You Lost! 😢 The word was "${theWord.toUpperCase()}".`;
             gameOver = true;
@@ -140,6 +148,8 @@ export default component({
         if (history.length > 0) {
             if (history[history.length - 1].word === theWord) {
                 won();
+            } else if (history[history.length - 1].word === "horse") {
+                cheater();
             } else if (history.length === 6) {
                 lost();
             }
@@ -177,6 +187,8 @@ export default component({
             usedGuesses.value++;
             if (input.value === theWord) {
                 won();
+            } else if (input.value === "horse") {
+                cheater();
             } else if (usedGuesses.value === totalGuesses) {
                 lost();
             } else {
