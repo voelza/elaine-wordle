@@ -104,7 +104,7 @@ export default component({
         const input: State<string> = state("");
         instance.$store.add({ input });
         function resultToClipboard() {
-            navigator.clipboard.writeText("Worsle 💀\n" + history.map(h => h.guesses).join("\n"));
+            navigator.clipboard.writeText("Worsle 💀\n" + history.map(h => h.guesses).join("\n") + "\n" + window.location.href);
             toast("Result was saved to clipboard!", { messageStyle: "text-align: center;", backgroundColor: "#aae1b3d9" });
         }
 
