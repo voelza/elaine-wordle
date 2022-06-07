@@ -1,4 +1,4 @@
-import { component, state } from "elaine";
+import { component, inert, state } from "elaine";
 import State from "elaine/dist/states/State";
 
 export default component({
@@ -6,14 +6,14 @@ export default component({
     template: `
     <div class="keyboard">
         <div class="keyboard-row">
-        <div @@for="key in @@firstRow" class="key" @@class="{@@alreadyUsed(@@usedKeys,@@key) : used}" ++click="addInput(@@key)">@@{key}</div>
+        <div @@for="key in @@firstRow" class="key" @@class="{@@alreadyUsed(@@usedKeys,@@key) : used; @@getLetterStatus(@@letterStatus,@@key) == 0 : green; @@getLetterStatus(@@letterStatus,@@key) == 1: yellow}" ++click="addInput(@@key)">@@{key}</div>
         </div>
         <div class="keyboard-row">
-            <div @@for="key in @@secondRow" class="key" @@class="{@@alreadyUsed(@@usedKeys,@@key) : used}" ++click="addInput(@@key)">@@{key}</div>
+            <div @@for="key in @@secondRow" class="key" @@class="{@@alreadyUsed(@@usedKeys,@@key) : used; @@getLetterStatus(@@letterStatus,@@key) == 0 : green; @@getLetterStatus(@@letterStatus,@@key) == 1: yellow}"" ++click="addInput(@@key)">@@{key}</div>
         </div>
         <div class="keyboard-row">
             <div class="key" ++click="enter">Enter</div>
-            <div @@for="key in @@thirdRow" class="key" @@class="{@@alreadyUsed(@@usedKeys,@@key) : used}" ++click="addInput(@@key)">@@{key}</div>
+            <div @@for="key in @@thirdRow" class="key" @@class="{@@alreadyUsed(@@usedKeys,@@key) : used; @@getLetterStatus(@@letterStatus,@@key) == 0 : green; @@getLetterStatus(@@letterStatus,@@key) == 1: yellow}" ++click="addInput(@@key)">@@{key}</div>
             <div class="key" ++click="backspace">⌫</div>
         </div>
     </div>
@@ -57,6 +57,14 @@ export default component({
     .used {
         background-color: lightgray;
     }
+
+    .green  {
+        background-color: #83e383;
+    }
+
+    .yellow {
+        background-color: #f9f9a3;
+    }
     `,
     props: [
         {
@@ -74,12 +82,26 @@ export default component({
             usedKeys.value = [];
         });
 
+        const letterStatus = inert(new Map<string, number>());
+        instance.addGlobalEventListener("letterStatus", ({ letter, status }) => {
+            const currentStatus = letterStatus.value.get(letter);
+            if (currentStatus === undefined) {
+                letterStatus.value.set(letter, status);
+                letterStatus.notify();
+            } else if (currentStatus !== undefined && currentStatus > status) {
+                letterStatus.value.set(letter, status);
+                letterStatus.notify();
+            }
+        });
+
+        instance.dispatchGlobalEvent("keyboardInit");
         return {
             state: {
                 usedKeys,
+                letterStatus,
                 firstRow: [..."qwertyuiop"],
                 secondRow: [..."asdfghjkl"],
-                thirdRow: [..."zxcvbnnm"],
+                thirdRow: [..."zxcvbnm"],
                 alreadyUsed: (usedKeys: string[], key: string): boolean => {
                     return usedKeys.includes(key);
                 },
@@ -91,6 +113,9 @@ export default component({
                 },
                 backspace: () => {
                     instance.dispatchGlobalEvent("handleBackspace");
+                },
+                getLetterStatus: (letterStatus: Map<string, number>, key: string) => {
+                    return letterStatus.get(key);
                 }
             }
         }

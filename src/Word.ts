@@ -42,24 +42,7 @@ export default component({
         gap: 2px;
     }
     `,
-    setup: (setupSate) => {
-        const theWord = setupSate.data.word;
-        const wordArray = computed(() => [...theWord.value], theWord);
-        const input: State<string> = state(setupSate.data.input.value ?? "");
-        setupSate.$store.watch("input", (i) => {
-            if (setupSate.data.isActive.value) {
-                input.value = i;
-            }
-        });
-
-        const getInput = (i: string, index: number) => {
-            if (index >= 0 && index < i.length) {
-                return i[index];
-            }
-            return "";
-        }
-
-
+    setup: (instance) => {
         const getStatusWithInput = (isRevealed: boolean, index: number, i: string) => {
             if (!isRevealed) {
                 return 2;
@@ -83,12 +66,29 @@ export default component({
             return 2;
         }
 
+        const theWord = instance.data.word;
+        const wordArray = computed(() => [...theWord.value], theWord);
+        const input: State<string> = state(instance.data.input.value ?? "");
+
+        instance.$store.watch("input", (i) => {
+            if (instance.data.isActive.value) {
+                input.value = i;
+            }
+        });
+
+        const getInput = (i: string, index: number) => {
+            if (index >= 0 && index < i.length) {
+                return i[index];
+            }
+            return "";
+        }
+
         const getStatus = (isRevealed: boolean, index: number) => {
             return getStatusWithInput(isRevealed, index, input.value);
         }
 
-        setupSate.addGlobalEventListener("enter", (input: string) => {
-            if (!setupSate.data.isActive.value) {
+        instance.addGlobalEventListener("enter", (input: string) => {
+            if (!instance.data.isActive.value) {
                 return;
             }
             let guesses = "";
@@ -101,18 +101,27 @@ export default component({
                 } else if (status === 0) {
                     guesses += "🟩";
                 }
+                instance.dispatchGlobalEvent("letterStatus", { letter: input[i], status });
             });
             const historyEntry: HistoryEntry = {
                 word: input,
                 guesses
             }
-            setupSate.dispatchGlobalEvent("historyAdd", historyEntry);
+            instance.dispatchGlobalEvent("historyAdd", historyEntry);
         });
 
-        setupSate.addGlobalEventListener("reset", () => {
+        instance.addGlobalEventListener("reset", () => {
             input.value = "";
         });
 
+        instance.addGlobalEventListener("keyboardInit", () => {
+            if (input.value.length > 0) {
+                [...input.value]
+                    .forEach((letter, index) => {
+                        instance.dispatchGlobalEvent("letterStatus", { letter: letter, status: getStatusWithInput(true, index, input.value) })
+                    });
+            }
+        });
         return {
             state: {
                 wordArray,
