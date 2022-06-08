@@ -1,4 +1,4 @@
-import { component, state } from "elaine";
+import { component, computed, state } from "elaine";
 import State from "elaine/dist/states/State";
 import Keyboard from "./Keyboard";
 import toast from "./Toaster";
@@ -14,7 +14,7 @@ export default component({
     name: "game",
     template: `
     <div class="game">
-        <div @@if="@@result" class="result">
+        <div @@style="@@resultStyle" class="result">
             <div class="result-text">@@{result}</div>
             <div class="result-btns">
                 Come back tomorrow!
@@ -38,12 +38,9 @@ export default component({
         justify-content: center;
         gap: 5px;
         height: 100%;
-        margin-top: 75px;
     }
 
     .result {
-        position: absolute;
-        top: 50px;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -98,10 +95,15 @@ export default component({
 
         let horseMode = false;
         const totalGuesses = 6;
-        let theWord: string = "horse";
+        let theWord: string = wordsIKnow[WORD_INDEX].toLowerCase();;
         const words: State<string[]> = state([]);
         const usedGuesses = state(history.length);
         const result: State<string | null> = state(null);
+        const resultStyle: State<any> = computed(() => {
+            return {
+                visibility: result.value ? "visible" : "hidden"
+            }
+        }, result);
         const input: State<string> = state("");
         instance.$store.add({ input });
         function resultToClipboard() {
@@ -112,7 +114,6 @@ export default component({
         }
 
         let gameOver = false;
-        theWord = wordsIKnow[WORD_INDEX].toLowerCase();
         const nextWords = [];
         for (let i = 0; i < totalGuesses; i++) {
             nextWords.push(theWord);
@@ -218,6 +219,7 @@ export default component({
                 words,
                 usedGuesses,
                 result,
+                resultStyle,
                 isActive: (guess: number, index: number) => guess === index,
                 isRevealed: (guess: number, index: number) => guess > index,
                 resultToClipboard,
